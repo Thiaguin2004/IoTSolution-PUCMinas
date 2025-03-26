@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+    IgnoreBody();
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title text-center">Login - IoTSolution</h2>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="Username">Usuário</label>
+                    <input type="text" class="form-control" id="Username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="Password">Senha</label>
+                    <input type="password" class="form-control" id="Password" name="password" required />
+                </div>
+                <br />
+                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#loginForm').submit(function (e) {
+                e.preventDefault();
+
+                var formData = {
+                    username: $('#Username').val(),
+                    password: $('#Password').val()
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Login", "Account")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (data) {
+                        if (data.success) {
+                            window.location.href = data.redirectUrl;
+                        } else {
+                            toastr.error(data.errorMessage);
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Ocorreu um erro ao tentar fazer login.');
+                    }
+                });
+            });
+        });
+    </script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f7fa;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,34 @@
+﻿@model List<IoTSolution.Models.DispositivosModel>
+
+@{
+    ViewData["Title"] = "Dispositivos";
+}
+
+<h1>Dispositivos</h1>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Descrição</th>
+                <th>Data e Hora de Cadastro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dispositivo in Model)
+            {
+                <tr>
+                    <td>@dispositivo.IdDispositivo</td>
+                    <td>@dispositivo.Descricao</td>
+                    <td>@dispositivo.DataHoraCadastro</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nenhum dispositivo encontrado.</p>
+}
