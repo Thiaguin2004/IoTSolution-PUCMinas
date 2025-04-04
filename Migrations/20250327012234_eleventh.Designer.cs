@@ -4,6 +4,7 @@ using IoTSolution.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IoTSolution.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250327012234_eleventh")]
+    partial class eleventh
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +40,6 @@ namespace IoTSolution.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("IdSensor")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
                     b.Property<string>("Mensagem")
@@ -116,9 +116,6 @@ namespace IoTSolution.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("EnviouMensagemDesdeUltimaAnomalia")
-                        .HasColumnType("bit");
-
                     b.Property<int>("IdDispositivo")
                         .HasColumnType("int");
 
@@ -155,10 +152,6 @@ namespace IoTSolution.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Sobrenome")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Usuario")

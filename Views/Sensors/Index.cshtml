@@ -6,6 +6,8 @@
 
 <h1>Sensores</h1>
 
+<a href="@Url.Action("Create", "Sensors")" class="btn btn-primary mb-3">Criar Sensores</a>
+
 @if (Model != null && Model.Any())
 {
     <table class="table">
@@ -14,15 +16,19 @@
                 <th>ID</th>
                 <th>Descrição</th>
                 <th>Data e Hora de Cadastro</th>
+                <th>Limite Inferior</th>
+                <th>Limite Superior</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var dispositivo in Model)
             {
                 <tr>
-                    <td>@dispositivo.IdSensor</td>
+                    <td><a href="@Url.Action("Edit", "Sensors", new { id = dispositivo.IdSensor })">@dispositivo.IdSensor</a></td>
                     <td>@dispositivo.Descricao</td>
                     <td>@dispositivo.DataHoraCadastro</td>
+                    <td>@dispositivo.LimiteInferiorTemperatura °C</td>
+                    <td>@dispositivo.LimiteSuperiorTemperatura °C</td>
                 </tr>
             }
         </tbody>

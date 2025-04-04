@@ -1,0 +1,29 @@
+﻿@model IoTSolution.Models.DispositivosModel
+
+@{
+    ViewData["Title"] = "Editar Dispositivo";
+}
+
+<h1>Editar Dispositivo</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.HiddenFor(model => model.IdDispositivo)
+    <div class="form-group">
+        <label for="IdUsuario">Usuário</label>
+        <input type="number" class="form-control" id="IdUsuario" name="IdUsuario" value="@Model.IdUsuario" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Descricao">Descrição</label>
+        <input type="text" class="form-control" id="Descricao" name="Descricao" value="@Model.Descricao" required />
+    </div>
+
+    <div class="form-group">
+        <label for="DataHoraCadastro">Data e Hora de Cadastro</label>
+        <input disabled type="datetime-local" class="form-control" id="DataHoraCadastro" name="DataHoraCadastro" value="@Model.DataHoraCadastro.ToString("yyyy-MM-ddTHH:mm")" required />
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </div>
+</form>

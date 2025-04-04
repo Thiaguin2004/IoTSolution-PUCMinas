@@ -1,0 +1,40 @@
+﻿@model List<IoTSolution.Models.UsuariosModel>
+
+@{
+    ViewData["Title"] = "Usuários";
+}
+
+<h1>Usuários</h1>
+
+<a href="@Url.Action("Create", "Usuarios")" class="btn btn-primary mb-3">Criar Usuário</a>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Usuário</th>
+                <th>Email</th>
+                <th>Telefone</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in Model)
+            {
+                <tr>
+                    <td><a href="@Url.Action("Edit", "Usuarios", new { id = usuario.IdUsuario })">@usuario.IdUsuario</a></td>
+                    <td>@usuario.Nome @usuario.Sobrenome</td>
+                    <td>@usuario.Usuario</td>
+                    <td>@usuario.Email</td>
+                    <td>@usuario.Telefone</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nenhum usuário encontrado.</p>
+}

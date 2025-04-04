@@ -15,7 +15,39 @@ namespace IoTSolution.Controllers
         {
             _context = context;
         }
+        // GET api/leituras (com filtros)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<LeiturasModel>>> GetLeituras(
+            int? dispositivo,
+            int? sensor,
+            DateTime? dataInicial,
+            DateTime? dataFinal,
+            decimal? temperatura)
+        {
+            var leiturasQuery = _context.Leituras.AsQueryable();
 
+            if (dispositivo.HasValue)
+                leiturasQuery = leiturasQuery.Where(l => l.IdDispositivo == dispositivo);
+
+            if (sensor.HasValue)
+                leiturasQuery = leiturasQuery.Where(l => l.IdSensor == sensor);
+
+            if (dataInicial.HasValue)
+                leiturasQuery = leiturasQuery.Where(l => l.DataHoraLeitura >= dataInicial.Value);
+
+            if (dataFinal.HasValue)
+                leiturasQuery = leiturasQuery.Where(l => l.DataHoraLeitura <= dataFinal.Value);
+
+            if (temperatura.HasValue)
+                leiturasQuery = leiturasQuery.Where(l => l.Temperatura == temperatura.Value);
+
+            var leituras = await leiturasQuery.ToListAsync();
+
+            if (leituras == null || leituras.Count == 0)
+                return Ok(null);
+
+            return Ok(leituras);
+        }
         // POST api/strings
         [HttpPost]
         public async Task<ActionResult<LeiturasModel>> PostString(string text, int dispositivo, int sensor)
@@ -24,12 +56,9 @@ namespace IoTSolution.Controllers
             {
                 IdDispositivo = dispositivo,
                 IdSensor = sensor,
-                Temperatura = text,
+                Temperatura = Convert.ToDecimal(text),
                 DataHoraLeitura = DateTime.Now
             };
-
-            if (model == null || string.IsNullOrEmpty(model.Temperatura))
-                return BadRequest("Texto não pode ser nulo ou vazio.");
 
             if (_context.Dispositivos.Find(dispositivo) == null)
                 return BadRequest("Insira um dispositivo que já exista.");
@@ -56,15 +85,15 @@ namespace IoTSolution.Controllers
         }
 
         // GET api/strings
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeiturasModel>>> GetAll()
-        {
-            var strings = await _context.Leituras.ToListAsync();
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<LeiturasModel>>> GetAll()
+        //{
+        //    var strings = await _context.Leituras.ToListAsync();
 
-            if (strings == null || strings.Count == 0)
-                return NotFound();
+        //    if (strings == null || strings.Count == 0)
+        //        return NotFound();
 
-            return Ok(strings);
-        }
+        //    return Ok(strings);
+        //}
     }
 }

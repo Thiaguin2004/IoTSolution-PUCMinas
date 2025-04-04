@@ -1,0 +1,44 @@
+﻿@model IoTSolution.Models.SensorsModel
+
+@{
+    ViewData["Title"] = "Editar Sensor";
+}
+
+<h1>Editar Sensor</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.HiddenFor(model => model.IdSensor)
+    <div class="form-group">
+        <label for="IdDispositivo">Dispositivo</label>
+        <input type="number" class="form-control" id="IdDispositivo" name="IdDispositivo" value="@Model.IdDispositivo" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Descricao">Descrição</label>
+        <input type="text" class="form-control" id="Descricao" name="Descricao" value="@Model.Descricao" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LimiteInferiorTemperatura">Limite Inferior de Temperatura</label>
+        <input type="text" class="form-control" id="LimiteInferiorTemperatura" name="LimiteInferiorTemperatura" value="@Model.LimiteInferiorTemperatura" step="0.01" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LimiteSuperiorTemperatura">Limite Superior de Temperatura</label>
+        <input type="text" class="form-control" id="LimiteSuperiorTemperatura" name="LimiteSuperiorTemperatura" value="@Model.LimiteSuperiorTemperatura" step="0.01" required />
+    </div>
+
+    <div class="form-group">
+        <label for="DataHoraCadastro">Data e Hora de Cadastro</label>
+        <input disabled type="datetime-local" class="form-control" id="DataHoraCadastro" name="DataHoraCadastro" value="@Model.DataHoraCadastro.ToString("yyyy-MM-ddTHH:mm")" required />
+    </div>
+
+    <div class="form-group form-check">
+        <input disabled type="checkbox" class="form-check-input" id="EnviouMensagemDesdeUltimaAnomalia" name="EnviouMensagemDesdeUltimaAnomalia" @(Model.EnviouMensagemDesdeUltimaAnomalia ? "checked" : "") />
+        <label class="form-check-label" for="EnviouMensagemDesdeUltimaAnomalia">Enviou mensagem desde a última anomalia?</label>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </div>
+</form>

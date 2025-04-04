@@ -6,6 +6,8 @@
 
 <h1>Dispositivos</h1>
 
+<a href="@Url.Action("Create", "Dispositivos")" class="btn btn-primary mb-3">Criar Dispositivo</a>
+
 @if (Model != null && Model.Any())
 {
     <table class="table">
@@ -20,7 +22,7 @@
             @foreach (var dispositivo in Model)
             {
                 <tr>
-                    <td>@dispositivo.IdDispositivo</td>
+                    <td><a href="@Url.Action("Edit", "Dispositivos", new { id = dispositivo.IdDispositivo })">@dispositivo.IdDispositivo</a></td>
                     <td>@dispositivo.Descricao</td>
                     <td>@dispositivo.DataHoraCadastro</td>
                 </tr>

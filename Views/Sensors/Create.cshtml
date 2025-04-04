@@ -1,0 +1,33 @@
+﻿@model IoTSolution.Models.SensorsModel
+
+@{
+    ViewData["Title"] = "Criar Sensor";
+}
+
+<h1>Criar Sensor</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="IdDispositivo">Dispositivo</label>
+        <input type="number" class="form-control" id="IdDispositivo" name="IdDispositivo" value="@Model.IdDispositivo" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Descricao">Descrição</label>
+        <input type="text" class="form-control" id="Descricao" name="Descricao" value="@Model.Descricao" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LimiteInferiorTemperatura">Limite Inferior de Temperatura</label>
+        <input type="text" class="form-control" id="LimiteInferiorTemperatura" name="LimiteInferiorTemperatura" value="@Model.LimiteInferiorTemperatura" step="0,01" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LimiteSuperiorTemperatura">Limite Superior de Temperatura</label>
+        <input type="text" class="form-control" id="LimiteSuperiorTemperatura" name="LimiteSuperiorTemperatura" value="@Model.LimiteSuperiorTemperatura" step="0,01" required />
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Criar</button>
+    </div>
+</form>

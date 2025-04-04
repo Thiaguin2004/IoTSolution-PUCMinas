@@ -1,116 +1,115 @@
-﻿using IoTSolution.Models;
+﻿using IoTSolution.Data;
+using IoTSolution.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Text.Json;
-using NuGet.DependencyResolver;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace IoTSolution.Controllers
 {
     [Authorize]
-    public partial class SensorsController : Controller
+    public class UsuariosController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
 
-        public SensorsController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public UsuariosController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
         }
 
-        // Método Index (já existente)
         public async Task<IActionResult> Index()
         {
             var baseUrl = _configuration["ApiSettings:BaseUrl"];
             var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync(baseUrl + "sensors");
+            var response = await client.GetAsync(baseUrl + "usuarios");
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var sensors = JsonConvert.DeserializeObject<List<SensorsModel>>(jsonString);
-                return View(sensors);
+                var usuarios = JsonConvert.DeserializeObject<List<UsuariosModel>>(jsonString);
+                return View(usuarios);
             }
 
             return View("Error");
         }
 
-        // Método Create GET
         public IActionResult Create()
         {
-            return View(new SensorsModel());
+            return View(new UsuariosModel());
         }
 
-        // Método Create POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SensorsModel model)
+        public async Task<IActionResult> Create(UsuariosModel model)
         {
             if (ModelState.IsValid)
             {
                 var baseUrl = _configuration["ApiSettings:BaseUrl"];
                 var client = _httpClientFactory.CreateClient();
-                var jsonContent = JsonConvert.SerializeObject(model);
-                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-
-                var response = await client.PostAsync(baseUrl + "sensors", content);
+                var response = await client.PostAsJsonAsync(baseUrl + "usuarios", model);
 
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction(nameof(Index));
                 }
-
-                ModelState.AddModelError("", "Erro ao criar o sensor.");
+                else
+                {
+                    return View("Error");
+                }
             }
 
             return View(model);
         }
-
-        // Método Edit GET
         public async Task<IActionResult> Edit(int id)
         {
             var baseUrl = _configuration["ApiSettings:BaseUrl"];
             var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync(baseUrl + "sensors/" + id);
+            var response = await client.GetAsync(baseUrl + $"usuarios/{id}");
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var sensor = JsonConvert.DeserializeObject<SensorsModel>(jsonString);
-                return View(sensor);
+                var usuario = JsonConvert.DeserializeObject<UsuariosModel>(jsonString);
+                if (usuario == null)
+                {
+                    return NotFound();
+                }
+
+                return View(usuario);
             }
 
             return View("Error");
         }
 
-        // Método Edit POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, SensorsModel model)
+        public async Task<IActionResult> Edit(int id, UsuariosModel model)
         {
+            if (id != model.IdUsuario)
+            {
+                return BadRequest();
+            }
+
             if (ModelState.IsValid)
             {
                 var baseUrl = _configuration["ApiSettings:BaseUrl"];
                 var client = _httpClientFactory.CreateClient();
-                var jsonContent = JsonConvert.SerializeObject(model);
-                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-
-                var response = await client.PutAsync(baseUrl + "sensors/" + id, content);
+                var response = await client.PutAsJsonAsync(baseUrl + $"usuarios/{id}", model);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));  // Redireciona para a lista de usuários
                 }
-
-                ModelState.AddModelError("", "Erro ao editar o sensor.");
+                else
+                {
+                    return View("Error");
+                }
             }
 
-            return View(model);
+            return View(model);  // Retorna o formulário com erros, se houver
         }
     }
 }

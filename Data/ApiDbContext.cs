@@ -12,5 +12,6 @@ namespace IoTSolution.Data
         public DbSet<DispositivosModel> Dispositivos { get; set; }
         public DbSet<SensorsModel> Sensors { get; set; }
         public DbSet<UsuariosModel> Usuarios { get; set; }
+        public DbSet<AlertasModel> Alertas { get; set; }
     }
 }
