@@ -48,7 +48,7 @@ namespace IoTSolution.Controllers
 
             return Ok(leituras);
         }
-        // POST api/strings
+        // POST api/leituras
         [HttpPost]
         public async Task<ActionResult<LeiturasModel>> PostString(string text, int dispositivo, int sensor)
         {
