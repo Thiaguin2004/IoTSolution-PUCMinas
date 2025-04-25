@@ -22,8 +22,8 @@
             @foreach (var dispositivo in Model)
             {
                 <tr>
-                    <td><a href="@Url.Action("Edit", "Dispositivos", new { id = dispositivo.IdDispositivo })">@dispositivo.IdDispositivo</a></td>
-                    <td>@dispositivo.Descricao</td>
+                    <td>@dispositivo.IdDispositivo</td>
+                    <td><a href="@Url.Action("Edit", "Dispositivos", new { id = dispositivo.IdDispositivo })">@dispositivo.Descricao</a></td>
                     <td>@dispositivo.DataHoraCadastro</td>
                 </tr>
             }

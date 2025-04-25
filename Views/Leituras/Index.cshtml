@@ -4,6 +4,13 @@
     ViewData["Title"] = "Leituras";
     var dispositivosList = ViewBag.Dispositivos as List<SelectListItem>;
     var sensoresList = ViewBag.Sensores as List<SelectListItem>;
+    var dataInicial = string.IsNullOrEmpty(Context.Request.Query["dataInicial"])
+        ? DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")
+        : Context.Request.Query["dataInicial"].ToString();
+
+    var dataFinal = string.IsNullOrEmpty(Context.Request.Query["dataFinal"])
+        ? DateTime.Now.ToString("yyyy-MM-dd")
+        : Context.Request.Query["dataFinal"].ToString();
 }
 
 <h1>Dispositivos</h1>
@@ -14,7 +21,7 @@
             <div class="col-md-2">
                 <label for="dispositivo">Dispositivo</label>
                 <select id="dispositivo" name="dispositivo" class="form-control" asp-items="@(ViewBag.Dispositivos as List<SelectListItem>)">
-                    <option value="">Todos</option>
+                    <option value="0">Todos</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -25,21 +32,25 @@
             </div>
             <div class="col-md-2">
                 <label for="dataInicial">Data Inicial</label>
-                <input type="date" id="dataInicial" name="dataInicial" class="form-control" value="@Context.Request.Query["dataInicial"]" />
+                <input type="date" id="dataInicial" name="dataInicial" class="form-control" value="@dataInicial" />
             </div>
             <div class="col-md-2">
                 <label for="dataFinal">Data Final</label>
-                <input type="date" id="dataFinal" name="dataFinal" class="form-control" value="@Context.Request.Query["dataFinal"]" />
+                <input type="date" id="dataFinal" name="dataFinal" class="form-control" value="@dataFinal" />
             </div>
             <div class="col-md-2">
-                <label for="temperatura">Temperatura</label>
-                <input type="text" step="0,1" id="temperatura" name="temperatura" class="form-control" value="@Context.Request.Query["temperatura"]" />
+                <label for="temperatura">Temperatura inicial</label>
+                <input type="text" step="0,1" id="temperaturaInicial" name="temperaturaInicial" class="form-control" value="@Context.Request.Query["temperaturaInicial"]" />
             </div>
             <div class="col-md-2">
+                <label for="temperatura">Temperatura final</label>
+                <input type="text" step="0,1" id="temperaturaFinal" name="temperaturaFinal" class="form-control" value="@Context.Request.Query["temperaturaFinal"]" />
+            </div>
+            <div class="col-md-1">
                 <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
             </div>
             <div class="col-md-2">
-                <a href="@Url.Action("RelatorioTemperaturas", "Leituras")" class="btn btn-success mt-4">Relatório de Temperaturas</a>
+                <a href="@Url.Action("Index", "Leituras")" class="btn btn-secondary mt-4">Limpar Filtros</a>
             </div>
         </div>
     </div>
@@ -78,3 +89,64 @@ else
 {
     <p>Nenhum dispositivo encontrado.</p>
 }
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(ViewBag.PageNumber == i ? "active" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                           dispositivo = Context.Request.Query["dispositivo"],
+                           sensor = Context.Request.Query["sensor"],
+                           dataInicial = Context.Request.Query["dataInicial"],
+                           dataFinal = Context.Request.Query["dataFinal"],
+                           temperaturaInicial = Context.Request.Query["temperaturaInicial"],
+                           temperaturaFinal = Context.Request.Query["temperaturaFinal"],
+                           pageNumber = i
+                       })">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+
+<script>
+    function carregarSensoresPorDispositivo(dispositivoId, sensorSelecionado = null) {
+        var sensorSelect = document.getElementById("sensor");
+        sensorSelect.innerHTML = '<option value="0">Todos</option>';
+
+        if (dispositivoId) {
+            fetch(`/Leituras/GetSensoresPorDispositivo?dispositivoId=${dispositivoId}`)
+                .then(response => response.json())
+                .then(sensores => {
+                    sensores.forEach(sensor => {
+                        var option = document.createElement("option");
+                        option.value = sensor.idSensor;
+                        option.text = sensor.descricao;
+                        if (sensorSelecionado && sensor.idSensor == sensorSelecionado) {
+                            option.selected = true;
+                        }
+                        sensorSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar sensores:', error));
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var dispositivoSelect = document.getElementById("dispositivo");
+        var sensorSelecionado = "@Context.Request.Query["sensor"]";
+
+        carregarSensoresPorDispositivo(dispositivoSelect.value, sensorSelecionado);
+
+        dispositivoSelect.addEventListener("change", function () {
+            carregarSensoresPorDispositivo(this.value);
+        });
+    });
+</script>
+
+

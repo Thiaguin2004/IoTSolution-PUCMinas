@@ -24,8 +24,8 @@
             @foreach (var usuario in Model)
             {
                 <tr>
-                    <td><a href="@Url.Action("Edit", "Usuarios", new { id = usuario.IdUsuario })">@usuario.IdUsuario</a></td>
-                    <td>@usuario.Nome @usuario.Sobrenome</td>
+                    <td>@usuario.IdUsuario</td>
+                    <td><a href="@Url.Action("Edit", "Usuarios", new { id = usuario.IdUsuario })">@usuario.Nome @usuario.Sobrenome</a></td>
                     <td>@usuario.Usuario</td>
                     <td>@usuario.Email</td>
                     <td>@usuario.Telefone</td>

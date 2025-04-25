@@ -9,29 +9,33 @@
 
 <form asp-action="Edit" method="post">
     @Html.HiddenFor(model => model.IdSensor)
-    <div class="form-group">
+    <div class="form-group col-md-4">
         <label for="IdDispositivo">Dispositivo</label>
         <select asp-for="IdDispositivo" class="form-control" asp-items="dispositivosList">
             <option value="">Selecione um dispositivo</option>
         </select>
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-md-4">
         <label for="Descricao">Descrição</label>
         <input type="text" class="form-control" id="Descricao" name="Descricao" value="@Model.Descricao" required />
     </div>
 
-    <div class="form-group">
+    <div>
         <label for="LimiteInferiorTemperatura">Limite Inferior de Temperatura</label>
-        <input type="text" class="form-control" id="LimiteInferiorTemperatura" name="LimiteInferiorTemperatura" value="@Model.LimiteInferiorTemperatura" step="0.01" required />
+        <div class="form-group col-md-1">
+            <input type="text" class="form-control" id="LimiteInferiorTemperatura" name="LimiteInferiorTemperatura" value="@Model.LimiteInferiorTemperatura" step="0.01" required />
+        </div>
     </div>
 
-    <div class="form-group">
+    <div>
         <label for="LimiteSuperiorTemperatura">Limite Superior de Temperatura</label>
-        <input type="text" class="form-control" id="LimiteSuperiorTemperatura" name="LimiteSuperiorTemperatura" value="@Model.LimiteSuperiorTemperatura" step="0.01" required />
+        <div class="form-group col-md-1">
+            <input type="text" class="form-control" id="LimiteSuperiorTemperatura" name="LimiteSuperiorTemperatura" value="@Model.LimiteSuperiorTemperatura" step="0.01" required />
+        </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-md-2">
         <label for="DataHoraCadastro">Data e Hora de Cadastro</label>
         <input disabled type="datetime-local" class="form-control" id="DataHoraCadastro" name="DataHoraCadastro" value="@Model.DataHoraCadastro.ToString("yyyy-MM-ddTHH:mm")" required />
     </div>
@@ -40,7 +44,7 @@
         <input disabled type="checkbox" class="form-check-input" id="EnviouMensagemDesdeUltimaAnomalia" name="EnviouMensagemDesdeUltimaAnomalia" @(Model.EnviouMensagemDesdeUltimaAnomalia ? "checked" : "") />
         <label class="form-check-label" for="EnviouMensagemDesdeUltimaAnomalia">Enviou mensagem desde a última anomalia?</label>
     </div>
-
+    <br>
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Salvar Alterações</button>
     </div>
