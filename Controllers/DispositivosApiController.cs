@@ -18,16 +18,19 @@ namespace IoTSolution.Controllers
 
         // POST api/dispositivos
         [HttpPost]
-        public async Task<ActionResult<DispositivosModel>> PostString(string text)
+        public async Task<ActionResult<DispositivosModel>> PostString(DispositivosModel model)
         {
-            DispositivosModel model = new DispositivosModel
-            {
-                Descricao = text,
-                DataHoraCadastro = DateTime.Now
-            };
+            if (model == null)
+                return BadRequest("Modelo de sensor não pode ser nulo.");
+
+            // Verifica se o dispositivo existe
+            if (_context.Dispositivos.Find(model.IdUsuario) == null)
+                return BadRequest("Usuário não encontrado.");
 
             if (model == null || string.IsNullOrEmpty(model.Descricao))
                 return BadRequest("Texto não pode ser nulo ou vazio.");
+
+            model.DataHoraCadastro = DateTime.Now;
 
             _context.Dispositivos.Add(model);
             await _context.SaveChangesAsync();
@@ -57,6 +60,42 @@ namespace IoTSolution.Controllers
                 return NotFound();
 
             return Ok(dispositivos);
+        }
+
+        // PUT api/dispositivos/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutDispositivo(int id, DispositivosModel model)
+        {
+            // Verifica se o modelo enviado é nulo
+            if (model == null)
+            {
+                return BadRequest("Modelo de dispositivo não pode ser nulo.");
+            }
+
+            // Verifica se o dispositivo existe
+            var existingDispositivo = await _context.Dispositivos.FindAsync(id);
+            if (existingDispositivo == null)
+            {
+                return NotFound("Dispositivo não encontrado.");
+            }
+
+            // Verifica se o usuário existe
+            var usuarioExistente = await _context.Usuarios.FindAsync(model.IdUsuario);
+            if (usuarioExistente == null)
+            {
+                return BadRequest("Usuário não encontrado.");
+            }
+
+            // Atualiza os campos do dispositivo
+            existingDispositivo.Descricao = model.Descricao;
+            existingDispositivo.IdUsuario = model.IdUsuario;
+            existingDispositivo.DataHoraCadastro = DateTime.Now; // Atualiza a data de cadastro ou mantém a existente, se necessário
+
+            // Salva as alterações no banco de dados
+            _context.Dispositivos.Update(existingDispositivo);
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // Retorna 204 No Content quando a atualização for bem-sucedida
         }
     }
 }

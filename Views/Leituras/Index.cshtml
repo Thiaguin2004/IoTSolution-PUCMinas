@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Leituras";
+    var dispositivosList = ViewBag.Dispositivos as List<SelectListItem>;
+    var sensoresList = ViewBag.Sensores as List<SelectListItem>;
 }
 
 <h1>Dispositivos</h1>
@@ -10,12 +12,16 @@
     <div class="container">
         <div class="row">
             <div class="col-md-2">
-                <label for="dispositivo">ID Dispositivo</label>
-                <input type="number" id="dispositivo" name="dispositivo" class="form-control" value="@Context.Request.Query["dispositivo"]" />
+                <label for="dispositivo">Dispositivo</label>
+                <select id="dispositivo" name="dispositivo" class="form-control" asp-items="@(ViewBag.Dispositivos as List<SelectListItem>)">
+                    <option value="">Todos</option>
+                </select>
             </div>
             <div class="col-md-2">
-                <label for="sensor">ID Sensor</label>
-                <input type="number" id="sensor" name="sensor" class="form-control" value="@Context.Request.Query["sensor"]" />
+                <label for="sensor">Sensor</label>
+                <select id="sensor" name="sensor" class="form-control" asp-items="@(ViewBag.Sensores as List<SelectListItem>)">
+                    <option value="">Todos</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <label for="dataInicial">Data Inicial</label>
@@ -31,6 +37,9 @@
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+            </div>
+            <div class="col-md-2">
+                <a href="@Url.Action("RelatorioTemperaturas", "Leituras")" class="btn btn-success mt-4">Relatório de Temperaturas</a>
             </div>
         </div>
     </div>
@@ -49,14 +58,17 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var dispositivo in Model)
+            @foreach (var leitura in Model)
             {
+                var dispositivoDesc = dispositivosList?.FirstOrDefault(d => d.Value == leitura.IdDispositivo.ToString())?.Text ?? leitura.IdDispositivo.ToString();
+                var sensorDesc = sensoresList?.FirstOrDefault(s => s.Value == leitura.IdSensor.ToString())?.Text ?? leitura.IdSensor.ToString();
+
                 <tr>
-                    <td>@dispositivo.IdLeitura</td>
-                    <td>@dispositivo.IdSensor</td>
-                    <td>@dispositivo.IdDispositivo</td>
-                    <td>@dispositivo.Temperatura °C</td>
-                    <td>@dispositivo.DataHoraLeitura</td>
+                    <td>@leitura.IdLeitura</td>
+                    <td>@sensorDesc</td>
+                    <td>@dispositivoDesc</td>
+                    <td>@leitura.Temperatura °C</td>
+                    <td>@leitura.DataHoraLeitura</td>
                 </tr>
             }
         </tbody>

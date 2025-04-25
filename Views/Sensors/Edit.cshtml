@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Editar Sensor";
+    var dispositivosList = ViewBag.Dispositivos as List<SelectListItem>;
 }
 
 <h1>Editar Sensor</h1>
@@ -10,7 +11,9 @@
     @Html.HiddenFor(model => model.IdSensor)
     <div class="form-group">
         <label for="IdDispositivo">Dispositivo</label>
-        <input type="number" class="form-control" id="IdDispositivo" name="IdDispositivo" value="@Model.IdDispositivo" required />
+        <select asp-for="IdDispositivo" class="form-control" asp-items="dispositivosList">
+            <option value="">Selecione um dispositivo</option>
+        </select>
     </div>
 
     <div class="form-group">

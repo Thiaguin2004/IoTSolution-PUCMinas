@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "Relatório de Temperaturas";
+    var dispositivosList = ViewBag.Dispositivos as List<SelectListItem>;
+    var sensoresList = ViewBag.Sensores as List<SelectListItem>;
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h1>Relatório de Temperaturas</h1>
+
+<form method="get" action="@Url.Action("RelatorioTemperaturas", "Leituras")">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <label for="dispositivo">Dispositivo</label>
+                <select id="dispositivo" name="dispositivo" class="form-control" asp-items="@(ViewBag.Dispositivos as List<SelectListItem>)">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="sensor">Sensor</label>
+                <select id="sensor" name="sensor" class="form-control" asp-items="@(ViewBag.Sensores as List<SelectListItem>)">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="dataInicial">Data Inicial</label>
+                <input type="date" id="dataInicial" name="dataInicial" class="form-control" value="@Context.Request.Query["dataInicial"]" />
+            </div>
+            <div class="col-md-2">
+                <label for="dataFinal">Data Final</label>
+                <input type="date" id="dataFinal" name="dataFinal" class="form-control" value="@Context.Request.Query["dataFinal"]" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<canvas id="temperaturaChart" width="400" height="200"></canvas>
+
+<script>
+    var chartData = @Html.Raw(Json.Serialize(Model));
+
+    var ctx = document.getElementById('temperaturaChart').getContext('2d');
+    var temperaturaChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Temperatura (°C)',
+                data: chartData.data,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Data e Hora'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperatura (°C)'
+                    },
+                    ticks: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        }
+    });
+</script>

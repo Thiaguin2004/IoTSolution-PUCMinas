@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IoTSolution.Controllers
 {
@@ -41,10 +42,28 @@ namespace IoTSolution.Controllers
         }
 
         // Método Create GET
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var baseUrl = _configuration["ApiSettings:BaseUrl"];
+            var client = _httpClientFactory.CreateClient();
+
+            // Busca a lista de dispositivos
+            var response = await client.GetAsync(baseUrl + "dispositivos");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var dispositivos = JsonConvert.DeserializeObject<List<DispositivosModel>>(json);
+
+                ViewBag.Dispositivos = dispositivos.Select(d => new SelectListItem
+                {
+                    Value = d.IdDispositivo.ToString(),
+                    Text = d.Descricao
+                }).ToList();
+            }
+
             return View(new SensorsModel());
         }
+
 
         // Método Create POST
         [HttpPost]
@@ -76,17 +95,32 @@ namespace IoTSolution.Controllers
         {
             var baseUrl = _configuration["ApiSettings:BaseUrl"];
             var client = _httpClientFactory.CreateClient();
-            var response = await client.GetAsync(baseUrl + "sensors/" + id);
 
-            if (response.IsSuccessStatusCode)
+            var sensorResponse = await client.GetAsync(baseUrl + $"sensors/{id}");
+            if (!sensorResponse.IsSuccessStatusCode)
+                return View("Error");
+
+            var jsonString = await sensorResponse.Content.ReadAsStringAsync();
+            var sensor = JsonConvert.DeserializeObject<SensorsModel>(jsonString);
+            if (sensor == null)
+                return NotFound();
+
+            var dispositivosResponse = await client.GetAsync(baseUrl + "dispositivos");
+            if (dispositivosResponse.IsSuccessStatusCode)
             {
-                var jsonString = await response.Content.ReadAsStringAsync();
-                var sensor = JsonConvert.DeserializeObject<SensorsModel>(jsonString);
-                return View(sensor);
+                var dispositivosJson = await dispositivosResponse.Content.ReadAsStringAsync();
+                var dispositivos = JsonConvert.DeserializeObject<List<DispositivosModel>>(dispositivosJson);
+
+                ViewBag.Dispositivos = dispositivos.Select(d => new SelectListItem
+                {
+                    Value = d.IdDispositivo.ToString(),
+                    Text = d.Descricao
+                }).ToList();
             }
 
-            return View("Error");
+            return View(sensor);
         }
+
 
         // Método Edit POST
         [HttpPost]
