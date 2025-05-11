@@ -19,7 +19,7 @@ const int idSensor = 1;       // Substitua com o ID real
 
 // Timer
 unsigned long lastTime = 0;
-unsigned long timerDelay = 10000;
+unsigned long timerDelay = 300000;
 
 void setup() {
   Serial.begin(115200);
@@ -44,6 +44,7 @@ void loop() {
 
     enviarPost(String(temperatura, 2));  // converte float para String com 2 casas decimais
   } else {
+    enviarLog("Erro: Sensor desconectado");
     Serial.println("Erro: Sensor desconectado.");
   }
 
@@ -63,6 +64,7 @@ void connectToWiFi() {
   }
 
   if (WiFi.status() == WL_CONNECTED) {
+    enviarLog("Wifi conectado!");
     Serial.println("\nWiFi conectado!");
     Serial.print("IP: ");
     Serial.println(WiFi.localIP());
@@ -77,6 +79,37 @@ void enviarPost(String temperatura) {
 
     // Monta URL com parâmetros
     String url = String(apiBaseUrl) + "?text=" + temperatura +
+                 "&dispositivo=" + idDispositivo +
+                 "&sensor=" + idSensor;
+
+    Serial.println("Enviando para: " + url);
+
+    http.begin(url);
+    int httpResponseCode = http.POST("");  // corpo vazio
+
+    if (httpResponseCode > 0) {
+      Serial.print("Código de resposta: ");
+      Serial.println(httpResponseCode);
+      String response = http.getString();
+      Serial.println("Resposta: " + response);
+    } else {
+      Serial.print("Erro ao enviar POST. Código: ");
+      Serial.println(httpResponseCode);
+    }
+
+    http.end();
+  } else {
+    Serial.println("WiFi desconectado. Tentando reconectar...");
+    connectToWiFi();
+  }
+}
+
+void enviarLog(String log) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+
+    // Monta URL com parâmetros
+    String url = String(apiBaseUrl) + "/logs?log=" + log +
                  "&dispositivo=" + idDispositivo +
                  "&sensor=" + idSensor;
 

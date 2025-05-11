@@ -120,7 +120,31 @@ namespace IoTSolution.Controllers
             return CreatedAtAction(nameof(GetString), new { id = model.IdLeitura }, model);
         }
 
-        // GET api/strings/{id}
+        // POST api/logs
+        [HttpPost("logs")]
+        public async Task<ActionResult<LogsModel>> PostLog(string log, int dispositivo, int sensor)
+        {
+            LogsModel model = new LogsModel
+            {
+                IdDispositivo = dispositivo,
+                IdSensor = sensor,
+                LogString = log,
+                DataHoraLog = DateTime.Now
+            };
+
+            if (_context.Dispositivos.Find(dispositivo) == null)
+                return BadRequest("Insira um dispositivo que já exista.");
+
+            if (_context.Sensors.Find(sensor) == null)
+                return BadRequest("Insira um sensor que já exista.");
+
+            _context.Logs.Add(model);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetString), new { id = model.IdLog }, model);
+        }
+
+        // GET api/leituras/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<LeiturasModel>> GetString(int id)
         {
@@ -132,7 +156,7 @@ namespace IoTSolution.Controllers
             return Ok(stringModel);
         }
 
-        // GET api/strings
+        // GET api/leituras
         //[HttpGet]
         //public async Task<ActionResult<IEnumerable<LeiturasModel>>> GetAll()
         //{
