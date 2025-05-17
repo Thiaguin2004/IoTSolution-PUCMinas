@@ -2,6 +2,7 @@ using IoTSolution.Data;
 using IoTSolution.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace IoTSolution.Controllers
 {
@@ -104,7 +105,7 @@ namespace IoTSolution.Controllers
             {
                 IdDispositivo = dispositivo,
                 IdSensor = sensor,
-                Temperatura = Convert.ToDecimal(text),
+                Temperatura = Convert.ToDecimal(text, CultureInfo.InvariantCulture),
                 DataHoraLeitura = DateTime.Now
             };
 
