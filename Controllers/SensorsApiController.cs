@@ -83,6 +83,8 @@ namespace IoTSolution.Controllers
             existingSensor.Descricao = model.Descricao;
             existingSensor.IdDispositivo = model.IdDispositivo;
             existingSensor.DataHoraCadastro = DateTime.Now; // Caso queira manter a data de criação ou definir uma nova
+            existingSensor.LimiteInferiorTemperatura = model.LimiteInferiorTemperatura;
+            existingSensor.LimiteSuperiorTemperatura = model.LimiteSuperiorTemperatura;
 
             // Salva as alterações
             _context.Sensors.Update(existingSensor);

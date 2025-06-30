@@ -28,50 +28,65 @@ public class AlertasService : IHostedService, IDisposable
         {
             var context = scope.ServiceProvider.GetRequiredService<ApiDbContext>();  // Resolve o DbContext dentro do escopo
 
-            var leituras = context.Leituras.ToList();
+            var leituras = context.Leituras.ToList().OrderByDescending(l => l.DataHoraLeitura).ToList();
             var sensores = context.Sensors.ToList();
+
+            var sensoresJaVerificados = new List<int>();
 
             foreach (var leitura in leituras)
             {
                 var sensor = sensores.FirstOrDefault(s => s.IdSensor == leitura.IdSensor);
                 if (sensor == null) continue;
 
-                if (leitura.Temperatura < sensor.LimiteInferiorTemperatura || leitura.Temperatura > sensor.LimiteSuperiorTemperatura)
+                if (sensoresJaVerificados.Contains(sensor.IdSensor)) continue;
+                else
                 {
-                    if (sensor.EnviouMensagemDesdeUltimaAnomalia && leitura.DataHoraLeitura.AddMinutes(10) <= DateTime.Now)
+                    if (leitura.Temperatura < sensor.LimiteInferiorTemperatura || leitura.Temperatura > sensor.LimiteSuperiorTemperatura)
                     {
-                        var dispositivo = context.Dispositivos.FirstOrDefault(d => d.IdDispositivo == leitura.IdDispositivo);
-                        if (dispositivo == null) continue;
-
-                        var usuarios = context.Usuarios.Where(u => u.IdUsuario == dispositivo.IdUsuario).ToList();
-
-                        foreach (var usuario in usuarios)
+                        if (sensor.EnviouMensagemDesdeUltimaAnomalia && leitura.DataHoraLeitura.AddMinutes(5) <= DateTime.Now)
                         {
-                            EnviarMensagemTwilio(usuario.Telefone, sensor.Descricao, leitura.Temperatura);
+                            var dispositivo = context.Dispositivos.FirstOrDefault(d => d.IdDispositivo == leitura.IdDispositivo);
+                            if (dispositivo == null) continue;
+
+                            var usuarios = context.Usuarios.Where(u => u.IdUsuario == dispositivo.IdUsuario).ToList();
+
+                            foreach (var usuario in usuarios)
+                            {
+                                EnviarMensagemTwilio(usuario.Telefone, sensor.Descricao, leitura.Temperatura);
+                            }
+
+                            sensor.EnviouMensagemDesdeUltimaAnomalia = true;
+                            context.Sensors.Update(sensor);
+                            context.SaveChanges();
                         }
 
-                        sensor.EnviouMensagemDesdeUltimaAnomalia = true;
+                        if (!sensor.EnviouMensagemDesdeUltimaAnomalia)
+                        {
+                            var dispositivo = context.Dispositivos.FirstOrDefault(d => d.IdDispositivo == leitura.IdDispositivo);
+                            if (dispositivo == null) continue;
+
+                            var usuarios = context.Usuarios.Where(u => u.IdUsuario == dispositivo.IdUsuario).ToList();
+
+                            foreach (var usuario in usuarios)
+                            {
+                                EnviarMensagemTwilio(usuario.Telefone, sensor.Descricao, leitura.Temperatura);
+                            }
+
+                            sensor.EnviouMensagemDesdeUltimaAnomalia = true;
+                            context.Sensors.Update(sensor);
+                            context.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        sensor.EnviouMensagemDesdeUltimaAnomalia = false;
                         context.Sensors.Update(sensor);
                         context.SaveChanges();
                     }
-
-                    if (!sensor.EnviouMensagemDesdeUltimaAnomalia)
-                    {
-                        var dispositivo = context.Dispositivos.FirstOrDefault(d => d.IdDispositivo == leitura.IdDispositivo);
-                        if (dispositivo == null) continue;
-
-                        var usuarios = context.Usuarios.Where(u => u.IdUsuario == dispositivo.IdUsuario).ToList();
-
-                        foreach (var usuario in usuarios)
-                        {
-                            EnviarMensagemTwilio(usuario.Telefone, sensor.Descricao, leitura.Temperatura);
-                        }
-
-                        sensor.EnviouMensagemDesdeUltimaAnomalia = true;
-                        context.Sensors.Update(sensor);
-                        context.SaveChanges();
-                    }
+                    
+                    sensoresJaVerificados.Add(sensor.IdSensor);
                 }
+
             }
         }
     }
